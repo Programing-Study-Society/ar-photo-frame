@@ -18,7 +18,7 @@ export async function getStaticPaths() {
     paths: imagesData.map((imageData) => ({
       params: { id: imageData.id },
     })),
-    fallback: "blocking",
+    fallback: false,
   };
 }
 
@@ -36,7 +36,6 @@ export const getStaticProps = async ({ params }: { params: { id: string } }) => 
       aspectRatio: imageData.aspectRatio,
       type: imageData.type,
     },
-    revalidate: 3600,
   };
 };
 
