@@ -1,7 +1,7 @@
 export const imagesData = [
   {
     id: "faculty_of_architectural_design",
-    fileUrl: "/faculty_of_architectural_design.png",
+    fileUrl: "/images/faculty_of_architectural_design.png",
     width: 1280,
     height: 960,
     aspectRatio: 4 / 3,
@@ -9,7 +9,7 @@ export const imagesData = [
   },
   {
     id: "faculty_of_information_science_and_arts",
-    fileUrl: "/faculty_of_comprehensive_informatics.png",
+    fileUrl: "/images/faculty_of_information_science_and_arts.png",
     width: 1280,
     height: 960,
     aspectRatio: 4 / 3,
@@ -17,7 +17,7 @@ export const imagesData = [
   },
   {
     id: "faculty_of_engineering",
-    fileUrl: "/faculty_of_engineering.png",
+    fileUrl: "/images/faculty_of_engineering.png",
     width: 1280,
     height: 960,
     aspectRatio: 4 / 3,
@@ -26,7 +26,7 @@ export const imagesData = [
   {
     id: "faculty_of_information_and_communication_engineering",
     fileUrl:
-      "/faculty_of_information_and_communication_engineering.png",
+      "/images/faculty_of_information_and_communication_engineering.png",
     width: 1280,
     height: 960,
     aspectRatio: 4 / 3,
@@ -34,7 +34,7 @@ export const imagesData = [
   },
   {
     id: "faculty_of_medical_science_and_health-promotion",
-    fileUrl: "/faculty_of_medical_and_health_sciences.png",
+    fileUrl: "/images/faculty_of_medical_science_and_health-promotion.png",
     width: 1280,
     height: 960,
     aspectRatio: 4 / 3,
