@@ -154,10 +154,10 @@ export const imagesData = [
   },
   {
     id: "open_campus_vtuber",
-    fileUrl: "/images/open_campus_vtuber.gif",
+    fileUrl: "/images/open_campus_vtuber.png",
     width: 1280,
     height: 960,
     aspectRatio: 4 / 3,
-    type: "gif",
+    type: "png",
   },
 ];
