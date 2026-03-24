@@ -1,11 +1,35 @@
-/*html, body {
-  overflow: hidden;
-  height: 100%;
-}*/
+:root {
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100svh;
+  min-height: 100vh;
+  margin: 0;
+}
 
 body {
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
   touch-action: none;
   user-select: none;
+}
+
+#__next {
+  flex: 1;
+  display: flex;
+  min-height: 100svh;
+  min-height: 100vh;
 }
 
 button {
