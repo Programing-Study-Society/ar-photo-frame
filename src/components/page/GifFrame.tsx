@@ -58,32 +58,32 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
         className={style["progress-indicator"]}>
         カメラを検索中...
       </ProgressIndicator>
-      <div className={style["container"]}>
-        <div className={style["camera-container"]}>
-          <Camera
-            webcamRef={webcamRef}
-            width={width}
-            height={height}
-            aspectRatio={aspectRatio}
-            facingMode={facingMode}
-            isCameraReady={file && gif && isCameraReady}
-            onUserMedia={onUserMedia}
-            className={style["camera"]}
-          />
-          {file && gif && isCameraReady && (
-            <Canvas canvasRef={canvasRef} onMount={onMount} className={style["overlay-canvas"]} />
-          )}
-        </div>
-        {file && gif && isCameraReady && (
-          <>
-            <CaptureButton onClick={onClick} className={style["capture-button"]} />
-            <CameraToggleFacingButton
-              onClick={toggleFacingMode}
-              className={style["camera-toggle-facing-button"]}
+        <div className={style["container"]}>
+          <div className={style["camera-container"]}>
+            <Camera
+              webcamRef={webcamRef}
+              width={width}
+              height={height}
+              aspectRatio={aspectRatio}
+              facingMode={facingMode}
+              isCameraReady={file && gif && isCameraReady}
+              onUserMedia={onUserMedia}
+              className={style["camera"]}
             />
-          </>
-        )}
-      </div>
+            {file && gif && isCameraReady && (
+              <Canvas canvasRef={canvasRef} onMount={onMount} className={style["overlay-canvas"]} />
+            )}
+            {file && gif && isCameraReady && (
+              <div className={style["controls"]}>
+                <CaptureButton onClick={onClick} className={style["capture-button"]} />
+                <CameraToggleFacingButton
+                  onClick={toggleFacingMode}
+                  className={style["camera-toggle-facing-button"]}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       <ShutterFadeIn isActive={isShutterActive} />
     </div>
   );
