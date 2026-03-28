@@ -9,17 +9,17 @@ const useWebcam = () => {
 
   const toggleFacingMode = useCallback(() => {
     setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
-    setIsCameraReady(false)
+    setIsCameraReady(false);
   }, []);
 
   const onCapture = useCallback((): HTMLCanvasElement | null => {
     if (!webcamRef.current) {
-      return null
+      return null;
     }
     const captureCanvas = webcamRef.current.getCanvas();
     if (facingMode === "user") return mirrorCanvas(captureCanvas);
-    return captureCanvas
-  }, []);
+    return captureCanvas;
+  }, [facingMode]);
 
   const onUserMedia = useCallback(() => {
     setIsCameraReady(true);

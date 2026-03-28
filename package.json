@@ -8,10 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "playwright:install": "playwright install chromium webkit",
-    "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed",
-    "test:e2e:ui": "playwright test --ui",
+    "playwright:install": "npm exec --yes --package=playwright@1.58.2 -- playwright install chromium webkit",
+    "test:e2e": "npm exec --yes --package=playwright@1.58.2 -- playwright test",
+    "test:e2e:headed": "npm exec --yes --package=playwright@1.58.2 -- playwright test --headed",
+    "test:e2e:ui": "npm exec --yes --package=playwright@1.58.2 -- playwright test --ui",
     "mcp:playwright": "playwright-mcp --isolated --ignore-https-errors --output-dir test-results/mcp"
   },
   "dependencies": {
@@ -26,8 +26,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@playwright/mcp": "^0.0.68",
-    "@playwright/test": "^1.58.2",
+    "@playwright/mcp": "0.0.68",
+    "@playwright/test": "1.58.2",
     "@types/gif.js": "^0.2.5",
     "@types/node": "^20",
     "@types/omggif": "^1.0.5",

@@ -46,7 +46,7 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   ]);
 
   return (
-    <div className={style["body"]}>
+    <div className={style["body"]} data-testid="camera-layout-root">
       <ProgressIndicator isLoading={!file} className={style["progress-indicator"]}>
         GIFファイルを取得中...
       </ProgressIndicator>
@@ -74,7 +74,7 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
               <Canvas canvasRef={canvasRef} onMount={onMount} className={style["overlay-canvas"]} />
             )}
             {file && gif && isCameraReady && (
-              <div className={style["controls"]}>
+              <div className={style["controls"]} data-testid="camera-controls">
                 <CaptureButton onClick={onClick} className={style["capture-button"]} />
                 <CameraToggleFacingButton
                   onClick={toggleFacingMode}

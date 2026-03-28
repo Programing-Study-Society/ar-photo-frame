@@ -37,7 +37,7 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter]);
 
   return (
-    <div className={style["body"]}>
+    <div className={style["body"]} data-testid="camera-layout-root">
       <ProgressIndicator isLoading={!modelsLoaded} className={style["progress-indicator"]}>
         モデルをロード中...
       </ProgressIndicator>
@@ -62,7 +62,7 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
             )}
             {isCameraReady && <Canvas canvasRef={canvasRef} className={style["overlay-canvas"]} />}
             {isCameraReady && (
-              <div className={style["controls"]}>
+              <div className={style["controls"]} data-testid="camera-controls">
                 <CaptureButton onClick={onClick} className={style["capture-button"]} />
                 <CameraToggleFacingButton
                   onClick={toggleFacingMode}
