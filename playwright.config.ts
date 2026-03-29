@@ -11,16 +11,12 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     baseURL,
-    permissions: ["camera"],
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
-    launchOptions: {
-      args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
-    },
   },
   webServer: {
-    command: "npm run dev:e2e",
+    command: "npm run build && npm run serve:e2e",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 240 * 1000,
@@ -28,7 +24,13 @@ export default defineConfig({
   projects: [
     {
       name: "chromium-desktop",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        permissions: ["camera"],
+        launchOptions: {
+          args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
+        },
+      },
     },
     {
       name: "firefox-desktop",
@@ -36,15 +38,34 @@ export default defineConfig({
     },
     {
       name: "webkit-iphone",
-      use: { ...devices["iPhone 15"] },
+      use: {
+        ...devices["iPhone 15"],
+        permissions: ["camera"],
+        launchOptions: {
+          args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
+        },
+      },
     },
     {
       name: "chromium-android",
-      use: { ...devices["Pixel 7"] },
+      use: {
+        ...devices["Pixel 7"],
+        permissions: ["camera"],
+        launchOptions: {
+          args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
+        },
+      },
     },
     {
       name: "chromium-tablet",
-      use: { ...devices["iPad (gen 7)"], browserName: "chromium" },
+      use: {
+        ...devices["iPad (gen 7)"],
+        browserName: "chromium",
+        permissions: ["camera"],
+        launchOptions: {
+          args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
+        },
+      },
     },
   ],
 });

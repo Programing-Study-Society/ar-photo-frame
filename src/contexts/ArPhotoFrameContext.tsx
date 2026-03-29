@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState } from "react";
 
 export const ArPhotoFrameContext = createContext<ArPhotoFrameContextType | undefined>(undefined);
 
@@ -9,16 +9,15 @@ export const ArPhotoFrameProvider: React.FC<ArPhotoFrameProviderProps> = ({ chil
 
   return (
     <ArPhotoFrameContext.Provider
-    value={
-      {
+      value={{
         capturedCanvas,
         setCapturedCanvas,
         overlayGif,
         setOverlayGif,
         overlayCanvas,
-        setOverlayCanvas
-      }
-    }>
+        setOverlayCanvas,
+      }}
+    >
       {children}
     </ArPhotoFrameContext.Provider>
   );

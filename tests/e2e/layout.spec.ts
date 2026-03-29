@@ -3,7 +3,9 @@ import { expect, test } from "@playwright/test";
 const TARGET_PATH = "/graduation_with_diploma";
 
 test.describe("responsive camera layout", () => {
-  test("controls stay visible and keep minimum touch size", async ({ page }) => {
+  test("controls stay visible and keep minimum touch size", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === "firefox-desktop", "Firefox lacks camera permission support in Playwright");
+
     await page.goto(TARGET_PATH);
 
     const layoutRoot = page.getByTestId("camera-layout-root");
