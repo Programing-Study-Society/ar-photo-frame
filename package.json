@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "playwright:install": "npm exec --yes --package=playwright@1.58.2 -- playwright install chromium webkit",
+    "playwright:install": "npm exec --yes --package=playwright@1.58.2 -- playwright install chromium firefox webkit",
     "test:e2e": "npm exec --yes --package=playwright@1.58.2 -- playwright test",
     "test:e2e:headed": "npm exec --yes --package=playwright@1.58.2 -- playwright test --headed",
     "test:e2e:ui": "npm exec --yes --package=playwright@1.58.2 -- playwright test --ui",
