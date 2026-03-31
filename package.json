@@ -4,9 +4,21 @@
   "private": true,
   "scripts": {
     "dev": "next dev --experimental-https --experimental-https-key ./certificates/lan-key.pem --experimental-https-cert ./certificates/lan.pem -p 3001 -H 0.0.0.0",
+    "dev:test": "next dev -p 4173 -H 127.0.0.1",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:desktop:chrome": "playwright test --project=desktop-chrome",
+    "test:e2e:desktop:firefox": "playwright test --project=desktop-firefox",
+    "test:e2e:iphone:chrome": "playwright test --project=iphone-chrome",
+    "test:e2e:iphone:firefox": "playwright test --project=iphone-firefox",
+    "test:e2e:android:chrome": "playwright test --project=android-chrome",
+    "test:e2e:android:firefox": "playwright test --project=android-firefox",
+    "test:e2e:tablet:chrome": "playwright test --project=tablet-chrome",
+    "test:e2e:tablet:firefox": "playwright test --project=tablet-firefox",
+    "test:e2e:requested": "playwright test --project=desktop-chrome --project=desktop-firefox --project=iphone-chrome --project=iphone-firefox --project=android-chrome --project=android-firefox --project=tablet-chrome --project=tablet-firefox"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.22-rc.20250304",
@@ -20,6 +32,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.58.2",
     "@types/gif.js": "^0.2.5",
     "@types/node": "^20",
     "@types/omggif": "^1.0.5",
