@@ -90,7 +90,6 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
             isCameraReady={file && gif && isCameraReady}
             onUserMedia={onUserMedia}
             onUserMediaError={onUserMediaError}
-            className={style["camera"]}
             testId="camera-view"
           />
           {file && gif && isCameraReady && (

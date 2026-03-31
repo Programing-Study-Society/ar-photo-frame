@@ -80,7 +80,6 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
             isCameraReady={isCameraReady}
             onUserMedia={onUserMedia}
             onUserMediaError={onUserMediaError}
-            className={style["camera"]}
             testId="camera-view"
           />
           {isCameraReady && (
