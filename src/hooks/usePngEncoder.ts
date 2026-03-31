@@ -1,15 +1,15 @@
 import { encodePng } from "@/utils/pngEncoder";
 import { useState, useEffect } from "react";
 
-const useGifEncoder = (ImageData: ImageData | null) => {
+const usePngEncoder = (imageData: ImageData | null) => {
   const [blob, setBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setBlob(null);
     setError(null);
-    if (ImageData) {
-      encodePng(ImageData)
+    if (imageData) {
+      encodePng(imageData)
         .then((blob) => {
           setBlob(blob);
         })
@@ -17,9 +17,9 @@ const useGifEncoder = (ImageData: ImageData | null) => {
           setError("PNGのエンコードに失敗しました。");
         });
     }
-  }, [ImageData]);
+  }, [imageData]);
 
   return { blob, error };
 };
 
-export default useGifEncoder;
+export default usePngEncoder;

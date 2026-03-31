@@ -33,6 +33,7 @@ export default defineConfig({
       name: "desktop-chrome",
       use: {
         ...devices["Desktop Chrome"],
+        channel: "chrome",
         permissions: ["camera"],
         launchOptions: {
           args: fakeMediaArgs,
@@ -123,7 +124,7 @@ export default defineConfig({
         hasTouch: true,
         viewport: { width: 834, height: 1194 },
         userAgent:
-          "Mozilla/5.0 (Android 14; Mobile; rv:135.0) Gecko/135.0 Firefox/135.0",
+          "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/135.0 Mobile/15E148 Safari/605.1.15",
         launchOptions: {
           firefoxUserPrefs: firefoxCameraPrefs,
         },
