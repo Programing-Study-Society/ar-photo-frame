@@ -58,3 +58,16 @@ npm run test:e2e:requested
 - `tests/e2e/critical`: 主要フロー（png/gif/face の撮影→保存→ダウンロード）
 - `tests/e2e/important`: 重要フロー（カメラ切替、ローディング遷移、保存ページ直接アクセス）
 - `tests/e2e/broad`: 広範囲スモーク（`imagesData` 全フレームIDの表示確認）
+
+## Playwright MCP
+
+Playwright MCP を使う場合は、このリポジトリの `.mcp.json` を利用できます。
+
+```bash
+npm ls @playwright/mcp
+```
+
+`.mcp.json` では以下のように固定バージョンで設定しています。
+
+- command: `npx`
+- args: `@playwright/mcp@0.0.69`
