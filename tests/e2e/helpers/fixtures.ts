@@ -48,13 +48,26 @@ export const expectCameraStyleApplied = async (page: Page) => {
 export const captureAndOpenSavePage = async (
   page: Page,
   route: `/${string}`,
-  saveRoute: "/savePNG" | "/saveGIF"
+  saveRoute: "/savePNG" | "/saveGIF",
+  expectedSize?: { width: number; height: number }
 ) => {
   await page.goto(route);
   await waitForFrameReady(page);
   await page.getByTestId("capture-button").click();
   await expect(page).toHaveURL(new RegExp(`${saveRoute}$`));
   await expect(page.getByTestId("save-preview-canvas")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("save-page-error-message")).toBeHidden({ timeout: 30_000 });
+
+  if (expectedSize) {
+    await expect(page.getByTestId("save-preview-canvas")).toHaveJSProperty(
+      "width",
+      expectedSize.width
+    );
+    await expect(page.getByTestId("save-preview-canvas")).toHaveJSProperty(
+      "height",
+      expectedSize.height
+    );
+  }
   await expect(page.getByTestId("save-button")).toBeVisible({ timeout: 60_000 });
 };
 
