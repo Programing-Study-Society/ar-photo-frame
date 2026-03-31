@@ -1,4 +1,4 @@
-import GIF from 'gif.js';
+import GIF from "gif.js";
 
 export const encodeGif = (gif: Gif): Promise<Blob> => {
   return new Promise((resolve, reject) => {
