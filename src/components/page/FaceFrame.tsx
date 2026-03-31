@@ -12,7 +12,7 @@ import { useShutterEffect } from "@/hooks/useShutterEffect";
 import style from "@/styles/page.module.css";
 import { useFaceDetection } from "@/hooks/useFaceDetection";
 
-const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
+const FaceFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayCanvas } = useArPhotoFrameContext();
   const {
     webcamRef,
@@ -107,4 +107,4 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   );
 };
 
-export default PngFrame;
+export default FaceFrame;
