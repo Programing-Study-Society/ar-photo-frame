@@ -63,11 +63,16 @@ npm run test:e2e:requested
 
 Playwright MCP を使う場合は、このリポジトリの `.mcp.json` を利用できます。
 
+devDependencies を含めてインストール済みであることを確認してください（`npm install` または `npm ci` で devDependencies が含まれていること）。
+
 ```bash
-npm ls @playwright/mcp
+npm ls @playwright/mcp --depth=0
+# 期待される出力例:
+# ar-photo-frame@... /path/to/ar-photo-frame
+# └── @playwright/mcp@0.0.69
 ```
 
-`.mcp.json` では以下のように固定バージョンで設定しています。
+`.mcp.json` では以下のようにバージョンを明示して設定しています（例）。
 
 - command: `npx`
 - args: `@playwright/mcp@0.0.69`
