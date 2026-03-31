@@ -41,7 +41,12 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const onClick = useCallback(() => {
     animateStop();
     triggerShutter();
-    setCapturedCanvas(onCapture());
+    setCapturedCanvas(
+      onCapture({
+        width,
+        height,
+      })
+    );
     setOverlayGif(gif);
     router.push("/saveGIF");
   }, [
@@ -52,6 +57,8 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
     animateStop,
     setOverlayGif,
     gif,
+    width,
+    height,
   ]);
 
   return (

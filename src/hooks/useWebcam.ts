@@ -14,13 +14,28 @@ const useWebcam = () => {
     setCameraError(null);
   }, []);
 
-  const onCapture = useCallback((): HTMLCanvasElement | null => {
+  const onCapture = useCallback((options: CaptureOptions): HTMLCanvasElement | null => {
     if (!webcamRef.current) {
       return null;
     }
-    const captureCanvas = webcamRef.current.getCanvas();
-    if (facingMode === "user") return mirrorCanvas(captureCanvas);
-    return captureCanvas;
+    const sourceCanvas = webcamRef.current.getCanvas();
+    if (!sourceCanvas) {
+      return null;
+    }
+
+    const normalizedCanvas = document.createElement("canvas");
+    normalizedCanvas.width = options.width;
+    normalizedCanvas.height = options.height;
+    const context = normalizedCanvas.getContext("2d");
+    if (!context) {
+      return null;
+    }
+
+    context.drawImage(sourceCanvas, 0, 0, options.width, options.height);
+    if (facingMode === "user") {
+      return mirrorCanvas(normalizedCanvas);
+    }
+    return normalizedCanvas;
   }, [facingMode]);
 
   const onUserMedia = useCallback(() => {

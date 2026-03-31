@@ -87,6 +87,11 @@ declare global {
     aspectRatio: number;
   }
 
+  interface CaptureOptions {
+    width: number;
+    height: number;
+  }
+
   interface GifFrame {
     imageData: ImageData;
     delay: number;

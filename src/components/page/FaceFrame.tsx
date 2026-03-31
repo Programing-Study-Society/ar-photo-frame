@@ -40,10 +40,15 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
 
   const onClick = useCallback(() => {
     triggerShutter();
-    setCapturedCanvas(onCapture());
+    setCapturedCanvas(
+      onCapture({
+        width,
+        height,
+      })
+    );
     setOverlayCanvas(canvasRef.current);
     router.push("/savePNG");
-  }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter]);
+  }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter, width, height]);
 
   return (
     <div className={style["body"]}>
