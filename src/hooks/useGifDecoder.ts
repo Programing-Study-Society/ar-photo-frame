@@ -3,15 +3,22 @@ import { useState, useEffect } from "react";
 
 const useGifDecoder = (file: Uint8Array | null) => {
   const [gif, setGif] = useState<Gif | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if(file){
-      const gif = decodeGif(file);
-      setGif(gif);
+    setGif(null);
+    setError(null);
+    if (file) {
+      try {
+        const gif = decodeGif(file);
+        setGif(gif);
+      } catch {
+        setError("GIFのデコードに失敗しました。");
+      }
     }
   }, [file]);
 
-  return { gif };
+  return { gif, error };
 };
 
 export default useGifDecoder;

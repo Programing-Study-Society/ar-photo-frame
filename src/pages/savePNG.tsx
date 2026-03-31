@@ -13,19 +13,35 @@ const SaveImage = () => {
   const { capturedCanvas, overlayCanvas } = useArPhotoFrameContext();
   const { combinedImageData } = useImageDataCompositor(capturedCanvas, overlayCanvas);
   const { canvasRef } = useDrawImageData(combinedImageData);
-  const { blob } = usePngEncoder(combinedImageData);
+  const { blob, error } = usePngEncoder(combinedImageData);
   const { onSave } = useOnSave(blob, ".png");
+  const hasInvalidState = !capturedCanvas || !overlayCanvas;
 
   return (
     <div className={style.body}>
       <div className={style["container"]}>
+        {hasInvalidState && (
+          <div className={style["mini-progress-indicator"]} data-testid="save-page-error-message">
+            画像データが見つかりません。最初からやり直してください。
+          </div>
+        )}
         {combinedImageData && (
           <>
-            <Canvas canvasRef={canvasRef} className={style["canvas"]} />
-            <ProgressIndicator isLoading={!blob} className={style["mini-progress-indicator"]}>
+            <Canvas canvasRef={canvasRef} className={style["canvas"]} testId="save-preview-canvas" />
+            <ProgressIndicator
+              isLoading={!error && !blob}
+              className={style["mini-progress-indicator"]}
+              testId="encoding-progress-indicator">
               PNGにエンコード中...
             </ProgressIndicator>
-            {blob && <SaveButton onClick={onSave} className={style["save-button"]} />}
+            {error && (
+              <div className={style["mini-progress-indicator"]} data-testid="save-page-error-message">
+                {error}
+              </div>
+            )}
+            {blob && (
+              <SaveButton onClick={onSave} className={style["save-button"]} testId="save-button" />
+            )}
           </>
         )}
       </div>

@@ -7,6 +7,7 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [faceDetector, setFaceDetector] = useState<FaceDetector | null>(null);
   const [modelsLoaded, setModelsLoaded] = useState<boolean>(false);
+  const [modelError, setModelError] = useState<string | null>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 
   const animationFrameRef = useRef<number | null>(null);
@@ -18,10 +19,25 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
   }, [fileUrl]);
 
   useEffect(() => {
-    loadModels().then((faceDetector) => {
-      setFaceDetector(faceDetector);
+    if (typeof window !== "undefined" && window.__ARPF_E2E_FACE_MOCK__) {
+      const mockFaceDetector = {
+        detect: () => ({ detections: [] }),
+      } as unknown as FaceDetector;
+      setFaceDetector(mockFaceDetector);
       setModelsLoaded(true);
-    });
+      setModelError(null);
+      return;
+    }
+    loadModels()
+      .then((faceDetector) => {
+        setFaceDetector(faceDetector);
+        setModelsLoaded(true);
+        setModelError(null);
+      })
+      .catch(() => {
+        setModelsLoaded(false);
+        setModelError("モデルのロードに失敗しました。");
+      });
   }, []);
 
   const detectFaces = useCallback(
@@ -32,6 +48,9 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
 
       const canvas = canvasRef.current;
       const webcam = webcamRef.current;
+      if (modelError) {
+        return;
+      }
       if (!faceDetector || !canvas || !image || !webcam) {
         setTimeout(() => detectFaces(mirrored), 100);
         return;
@@ -82,7 +101,7 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
 
       processDetection();
     },
-    [faceDetector, image, webcamRef]
+    [faceDetector, image, webcamRef, modelError]
   );
 
   useEffect(() => {
@@ -93,5 +112,5 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
     };
   }, []);
 
-  return { canvasRef, modelsLoaded, detectFaces };
+  return { canvasRef, modelsLoaded, modelError, detectFaces };
 };

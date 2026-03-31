@@ -2,7 +2,7 @@ import style from '@/styles/canvas.module.css'
 import { classNames } from '@/utils/classNames';
 import { useEffect } from "react";
 
-const Canvas = ({ canvasRef, onMount, className }: CanvasProps) => {
+const Canvas = ({ canvasRef, onMount, className, testId }: CanvasProps) => {
   useEffect(() => {
     if (onMount) {
       onMount();
@@ -13,6 +13,7 @@ const Canvas = ({ canvasRef, onMount, className }: CanvasProps) => {
     <canvas
       ref={canvasRef}
       className={classNames(style.canvas, className)}
+      data-testid={testId}
       ></canvas>
   )
 }

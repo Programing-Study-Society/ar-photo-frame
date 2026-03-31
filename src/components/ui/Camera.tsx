@@ -10,7 +10,9 @@ const Camera = ({
   facingMode,
   isCameraReady,
   onUserMedia,
+  onUserMediaError,
   className,
+  testId,
 }: CameraProps) => {
   const videoConstraints: MediaTrackConstraints = {
     width: { ideal: width },
@@ -27,7 +29,9 @@ const Camera = ({
       videoConstraints={videoConstraints}
       className={classNames(style["camera"], className)}
       onUserMedia={onUserMedia}
+      onUserMediaError={onUserMediaError}
       mirrored={facingMode === "user"}
+      data-testid={testId}
       style={{
         display: isCameraReady ? "" : "none",
       }}

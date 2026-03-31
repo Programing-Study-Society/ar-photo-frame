@@ -16,13 +16,22 @@ import useFetchFile from "@/hooks/useFetchFile";
 
 const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayGif } = useArPhotoFrameContext();
-  const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
-    useWebcam();
-  const { file } = useFetchFile(fileUrl);
-  const { gif } = useGifDecoder(file);
+  const {
+    webcamRef,
+    facingMode,
+    isCameraReady,
+    cameraError,
+    onCapture,
+    onUserMedia,
+    onUserMediaError,
+    toggleFacingMode,
+  } = useWebcam();
+  const { file, error: fileError } = useFetchFile(fileUrl);
+  const { gif, error: decodeError } = useGifDecoder(file);
   const { canvasRef, onMount, animateStop } = useGifAnimator(gif);
   const { isShutterActive, triggerShutter } = useShutterEffect();
   const router = useRouter();
+  const frameError = fileError || decodeError || cameraError;
 
   useEffect(() => {
     router.prefetch("/saveGIF");
@@ -47,17 +56,29 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
 
   return (
     <div className={style["body"]}>
-      <ProgressIndicator isLoading={!file} className={style["progress-indicator"]}>
+      <ProgressIndicator
+        isLoading={!frameError && !file}
+        className={style["progress-indicator"]}
+        testId="loading-file-indicator">
         GIFファイルを取得中...
       </ProgressIndicator>
-      <ProgressIndicator isLoading={file && !gif} className={style["progress-indicator"]}>
+      <ProgressIndicator
+        isLoading={!frameError && !!file && !gif}
+        className={style["progress-indicator"]}
+        testId="loading-decode-indicator">
         GIFをデコード中...
       </ProgressIndicator>
       <ProgressIndicator
-        isLoading={file && gif && !isCameraReady}
-        className={style["progress-indicator"]}>
+        isLoading={!frameError && !!file && !!gif && !isCameraReady}
+        className={style["progress-indicator"]}
+        testId="loading-camera-indicator">
         カメラを検索中...
       </ProgressIndicator>
+      {frameError && (
+        <div className={style["progress-indicator"]} data-testid="frame-error-message">
+          {frameError}
+        </div>
+      )}
       <div className={style["container"]}>
         <div className={style["camera-container"]}>
           <Camera
@@ -68,18 +89,30 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
             facingMode={facingMode}
             isCameraReady={file && gif && isCameraReady}
             onUserMedia={onUserMedia}
+            onUserMediaError={onUserMediaError}
             className={style["camera"]}
+            testId="camera-view"
           />
           {file && gif && isCameraReady && (
-            <Canvas canvasRef={canvasRef} onMount={onMount} className={style["overlay-canvas"]} />
+            <Canvas
+              canvasRef={canvasRef}
+              onMount={onMount}
+              className={style["overlay-canvas"]}
+              testId="overlay-canvas"
+            />
           )}
         </div>
         {file && gif && isCameraReady && (
           <>
-            <CaptureButton onClick={onClick} className={style["capture-button"]} />
+            <CaptureButton
+              onClick={onClick}
+              className={style["capture-button"]}
+              testId="capture-button"
+            />
             <CameraToggleFacingButton
               onClick={toggleFacingMode}
               className={style["camera-toggle-facing-button"]}
+              testId="camera-toggle-button"
             />
           </>
         )}

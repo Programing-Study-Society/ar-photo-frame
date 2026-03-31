@@ -14,11 +14,20 @@ import { useFaceDetection } from "@/hooks/useFaceDetection";
 
 const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayCanvas } = useArPhotoFrameContext();
-  const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
-    useWebcam();
-  const { canvasRef, modelsLoaded, detectFaces } = useFaceDetection(webcamRef, fileUrl);
+  const {
+    webcamRef,
+    facingMode,
+    isCameraReady,
+    cameraError,
+    onCapture,
+    onUserMedia,
+    onUserMediaError,
+    toggleFacingMode,
+  } = useWebcam();
+  const { canvasRef, modelsLoaded, modelError, detectFaces } = useFaceDetection(webcamRef, fileUrl);
   const { isShutterActive, triggerShutter } = useShutterEffect();
   const router = useRouter();
+  const frameError = modelError || cameraError;
 
   useEffect(() => {
     router.prefetch("/savePNG");
@@ -38,14 +47,23 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
 
   return (
     <div className={style["body"]}>
-      <ProgressIndicator isLoading={!modelsLoaded} className={style["progress-indicator"]}>
+      <ProgressIndicator
+        isLoading={!frameError && !modelsLoaded}
+        className={style["progress-indicator"]}
+        testId="loading-model-indicator">
         モデルをロード中...
       </ProgressIndicator>
       <ProgressIndicator
-        isLoading={modelsLoaded && !isCameraReady}
-        className={style["progress-indicator"]}>
+        isLoading={!frameError && modelsLoaded && !isCameraReady}
+        className={style["progress-indicator"]}
+        testId="loading-camera-indicator">
         カメラを検索中...
       </ProgressIndicator>
+      {frameError && (
+        <div className={style["progress-indicator"]} data-testid="frame-error-message">
+          {frameError}
+        </div>
+      )}
       <div className={style["container"]}>
         <div className={style["camera-container"]}>
           {modelsLoaded && (
@@ -57,17 +75,30 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
               facingMode={facingMode}
               isCameraReady={isCameraReady}
               onUserMedia={newOnUserMedia}
+              onUserMediaError={onUserMediaError}
               className={style["camera"]}
+              testId="camera-view"
             />
           )}
-          {isCameraReady && <Canvas canvasRef={canvasRef} className={style["overlay-canvas"]} />}
+          {isCameraReady && (
+            <Canvas
+              canvasRef={canvasRef}
+              className={style["overlay-canvas"]}
+              testId="overlay-canvas"
+            />
+          )}
         </div>
         {isCameraReady && (
           <>
-            <CaptureButton onClick={onClick} className={style["capture-button"]} />
+            <CaptureButton
+              onClick={onClick}
+              className={style["capture-button"]}
+              testId="capture-button"
+            />
             <CameraToggleFacingButton
               onClick={toggleFacingMode}
               className={style["camera-toggle-facing-button"]}
+              testId="camera-toggle-button"
             />
           </>
         )}

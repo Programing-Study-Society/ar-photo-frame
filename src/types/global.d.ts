@@ -1,6 +1,9 @@
 import React, { ReactNode, RefObject } from "react";
 
 declare global {
+  interface Window {
+    __ARPF_E2E_FACE_MOCK__?: boolean;
+  }
 
   interface CameraProps {
     webcamRef: RefObject<Webcam | null>;
@@ -10,18 +13,23 @@ declare global {
     facingMode: CameraFacingMode;
     isCameraReady: boolean | null;
     onUserMedia?: (stream: MediaStream) => void;
+    onUserMediaError?: (error: string | DOMException) => void;
     className?: string;
+    testId?: string;
   }
 
   interface CanvasProps {
     canvasRef: RefObject<HTMLCanvasElement | null>;
     onMount?: () => void;
     className?: string;
+    testId?: string;
   }
 
   interface ButtonProps {
     onClick: React.MouseEventHandler<HTMLButtonElement>;
     className?: string;
+    testId?: string;
+    ariaLabel?: string;
   }
 
   interface GifCanvasProps {
@@ -32,6 +40,7 @@ declare global {
     isLoading: boolean | null;
     children?: React.ReactNode;
     className?: string;
+    testId?: string;
   }
 
   interface ShutterFadeInProps {
@@ -64,7 +73,6 @@ declare global {
   };
 
   interface ArPhotoFramePageProps {
-    id: string;
     fileUrl: string;
     width: number;
     height: number;

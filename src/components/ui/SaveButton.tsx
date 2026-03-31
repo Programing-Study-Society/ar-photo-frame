@@ -2,9 +2,13 @@ import React from "react";
 import style from "@/styles/saveButton.module.css";
 import { classNames } from "@/utils/classNames";
 
-const CaptureButton = ({ onClick, className }: ButtonProps) => {
+const SaveButton = ({ onClick, className, testId, ariaLabel = "保存" }: ButtonProps) => {
   return (
-    <button onClick={onClick} className={classNames(style["button"], className)}>
+    <button
+      onClick={onClick}
+      className={classNames(style["button"], className)}
+      data-testid={testId}
+      aria-label={ariaLabel}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -17,4 +21,4 @@ const CaptureButton = ({ onClick, className }: ButtonProps) => {
   );
 };
 
-export default CaptureButton;
+export default SaveButton;
