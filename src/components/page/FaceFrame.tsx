@@ -39,16 +39,28 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   }, [onUserMedia, detectFaces, facingMode]);
 
   const onClick = useCallback(() => {
+    const capturedCanvas = onCapture({
+      width,
+      height,
+    });
+    const overlayCanvas = canvasRef.current;
+    if (!capturedCanvas || !overlayCanvas) {
+      return;
+    }
     triggerShutter();
-    setCapturedCanvas(
-      onCapture({
-        width,
-        height,
-      })
-    );
-    setOverlayCanvas(canvasRef.current);
+    setCapturedCanvas(capturedCanvas);
+    setOverlayCanvas(overlayCanvas);
     router.push("/savePNG");
-  }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter, width, height]);
+  }, [
+    canvasRef,
+    onCapture,
+    router,
+    setCapturedCanvas,
+    setOverlayCanvas,
+    triggerShutter,
+    width,
+    height,
+  ]);
 
   return (
     <div className={style["body"]}>
