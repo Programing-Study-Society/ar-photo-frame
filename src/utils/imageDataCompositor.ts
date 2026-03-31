@@ -1,4 +1,5 @@
 export const compositeImageData = (background: ImageData, foreground: ImageData): ImageData | null => {
+  const OVERLAY_WIDTH_SCALE = 1.1;
   const canvas = document.createElement("canvas");
   canvas.width = background.width;
   canvas.height = background.height;
@@ -15,8 +16,9 @@ export const compositeImageData = (background: ImageData, foreground: ImageData)
   ctx.putImageData(background, 0, 0);
   overlayCtx.putImageData(foreground, 0, 0);
   const canvasAspectRatio = foreground.width / foreground.height;
-  const drawWidth = background.height * canvasAspectRatio;
-  const drawHeight = background.height;
+  const baseDrawWidth = background.height * canvasAspectRatio;
+  const drawWidth = Math.min(background.width, baseDrawWidth * OVERLAY_WIDTH_SCALE);
+  const drawHeight = drawWidth / canvasAspectRatio;
   const offsetX = (background.width - drawWidth) / 2;
   const offsetY = (background.height - drawHeight) / 2;
   ctx.drawImage(overlayCanvas, offsetX, offsetY, drawWidth, drawHeight);
