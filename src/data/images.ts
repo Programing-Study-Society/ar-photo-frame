@@ -168,7 +168,7 @@ export const imagesData = [
     height: 960,
     aspectRatio: 4 / 3,
     type: "png",
-    enabled: false,
+    enabled: true,
   },
   {
     id: "signboard_entrance_ceremony",
