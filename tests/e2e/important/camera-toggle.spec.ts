@@ -1,8 +1,19 @@
-import { expect, test, waitForFrameReady } from "../helpers/fixtures";
+import {
+  expect,
+  expectLatestCameraConstraintsToUseIdealValues,
+  installCameraRegressionInstrumentation,
+  test,
+  waitForFrameReady,
+} from "../helpers/fixtures";
 
 test("カメラ切替後も再度撮影可能になる", async ({ page }) => {
+  await installCameraRegressionInstrumentation(page);
   await page.goto("/faculty_of_architectural_design");
   await waitForFrameReady(page);
+  await expectLatestCameraConstraintsToUseIdealValues(page, {
+    aspectRatio: 4 / 3,
+    facingMode: "environment",
+  });
 
   const toggleButton = page.getByTestId("camera-toggle-button");
   await toggleButton.click();
@@ -11,4 +22,8 @@ test("カメラ切替後も再度撮影可能になる", async ({ page }) => {
     page.getByTestId("capture-button").or(page.getByTestId("loading-camera-indicator"))
   ).toBeVisible();
   await waitForFrameReady(page);
+  await expectLatestCameraConstraintsToUseIdealValues(page, {
+    aspectRatio: 4 / 3,
+    facingMode: "user",
+  });
 });
