@@ -42,7 +42,7 @@ export const calculateCropRegion = (
  * 
  * @param sourceCanvas - 元の Canvas
  * @param targetAspectRatio - ターゲットのアスペクト比
- * @returns クロップされた新しい Canvas（ネイティブ解像度）
+ * @returns クロップされた新しい Canvas（ネイティブ解像度）、または空の Canvas の場合は null
  */
 export const cropCanvas = (
   sourceCanvas: HTMLCanvasElement | null,
@@ -52,6 +52,11 @@ export const cropCanvas = (
 
   const sourceWidth = sourceCanvas.width;
   const sourceHeight = sourceCanvas.height;
+
+  // 空の Canvas の場合は null を返す
+  if (sourceWidth === 0 || sourceHeight === 0) {
+    return null;
+  }
 
   const { offsetX, offsetY, cropWidth, cropHeight } = calculateCropRegion(
     sourceWidth,

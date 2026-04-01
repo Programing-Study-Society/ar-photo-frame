@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
 
 /**
@@ -20,15 +20,16 @@ const useGifAnimator = (
 ) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [animateStop, setAnimateStop] = useState<() => void>(() => {});
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const onMount = useCallback(() => {
+  const startAnimation = useCallback((): boolean => {
     if (!gif || !canvasRef.current) {
-      return;
+      return false;
     }
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) return false;
 
     let canvasWidth: number;
     let canvasHeight: number;
@@ -40,10 +41,15 @@ const useGifAnimator = (
     // webcamRef が指定されている場合はカメラサイズに合わせる
     if (webcamRef?.current) {
       const video = webcamRef.current.video;
-      if (!video) return;
+      if (!video) return false;
 
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
+
+      // ビデオサイズがまだ確定していない場合はリトライ
+      if (videoWidth === 0 || videoHeight === 0) {
+        return false;
+      }
 
       canvasWidth = videoWidth;
       canvasHeight = videoHeight;
@@ -53,13 +59,11 @@ const useGifAnimator = (
       const videoAspectRatio = videoWidth / videoHeight;
 
       if (videoAspectRatio > gifAspectRatio) {
-        // カメラの方が横長 → GIFを左右に引き延ばす
         drawWidth = videoWidth;
         drawHeight = videoWidth / gifAspectRatio;
         drawX = 0;
         drawY = (videoHeight - drawHeight) / 2;
       } else {
-        // カメラの方が縦長 → GIFを上下に引き延ばす
         drawHeight = videoHeight;
         drawWidth = videoHeight * gifAspectRatio;
         drawX = (videoWidth - drawWidth) / 2;
@@ -84,7 +88,7 @@ const useGifAnimator = (
     tempCanvas.width = gif.width;
     tempCanvas.height = gif.height;
     const tempCtx = tempCanvas.getContext("2d");
-    if (!tempCtx) return;
+    if (!tempCtx) return false;
 
     let currentFrame = 0;
     let isAnimating = false;
@@ -136,7 +140,35 @@ const useGifAnimator = (
 
     start();
     setAnimateStop(() => stop);
+    return true;
   }, [gif, webcamRef]);
+
+  const onMount = useCallback(() => {
+    // 既存のリトライをキャンセル
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+
+    const tryStart = () => {
+      const success = startAnimation();
+      if (!success && webcamRef) {
+        // webcamRef がある場合のみリトライ（ビデオサイズ待ち）
+        retryTimeoutRef.current = setTimeout(tryStart, 100);
+      }
+    };
+
+    tryStart();
+  }, [startAnimation, webcamRef]);
+
+  // クリーンアップ
+  useEffect(() => {
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return { canvasRef, onMount, animateStop };
 };
