@@ -11,8 +11,9 @@ import useWebcam from "@/hooks/useWebcam";
 import { useShutterEffect } from "@/hooks/useShutterEffect";
 import style from "@/styles/page.module.css";
 import { useFaceDetection } from "@/hooks/useFaceDetection";
+import { cropCanvas } from "@/utils/cropCanvas";
 
-const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
+const FaceFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayCanvas } = useArPhotoFrameContext();
   const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
     useWebcam(aspectRatio);
@@ -32,9 +33,11 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const onClick = useCallback(() => {
     triggerShutter();
     setCapturedCanvas(onCapture());
-    setOverlayCanvas(canvasRef.current);
+    // オーバーレイCanvasもカメラと同じアスペクト比でクロップ
+    const croppedOverlay = cropCanvas(canvasRef.current, aspectRatio);
+    setOverlayCanvas(croppedOverlay);
     router.push("/savePNG");
-  }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter]);
+  }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter, aspectRatio]);
 
   return (
     <div className={style["body"]}>
@@ -77,4 +80,4 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   );
 };
 
-export default PngFrame;
+export default FaceFrame;

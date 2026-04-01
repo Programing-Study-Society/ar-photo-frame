@@ -13,6 +13,7 @@ import style from "@/styles/page.module.css";
 import useFetchFile from "@/hooks/useFetchFile";
 import usePngDecoder from "@/hooks/usePngDecoder";
 import useImageDataDrawer from "@/hooks/useImageDataDrawer";
+import { cropCanvas } from "@/utils/cropCanvas";
 
 const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayCanvas } = useArPhotoFrameContext();
@@ -31,9 +32,11 @@ const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const onClick = useCallback(() => {
     triggerShutter();
     setCapturedCanvas(onCapture());
-    setOverlayCanvas(canvasRef.current);
+    // オーバーレイCanvasもカメラと同じアスペクト比でクロップ
+    const croppedOverlay = cropCanvas(canvasRef.current, aspectRatio);
+    setOverlayCanvas(croppedOverlay);
     router.push("/savePNG");
-  }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter]);
+  }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter, aspectRatio]);
 
   return (
     <div className={style["body"]}>
