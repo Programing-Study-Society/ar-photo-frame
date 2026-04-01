@@ -4,8 +4,10 @@ import { classNames } from "@/utils/classNames";
 
 const Camera = ({
   webcamRef,
-  width,
-  height,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  width: _width,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  height: _height,
   aspectRatio,
   facingMode,
   isCameraReady,
