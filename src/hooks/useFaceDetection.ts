@@ -3,7 +3,10 @@ import Webcam from "react-webcam";
 import { loadModels } from "@/utils/mediapipe";
 import { FaceDetector } from "@mediapipe/tasks-vision";
 
-export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, fileUrl: string) => {
+export const useFaceDetection = (
+  webcamRef: React.RefObject<Webcam | null>,
+  fileUrl: string
+) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [faceDetector, setFaceDetector] = useState<FaceDetector | null>(null);
   const [modelsLoaded, setModelsLoaded] = useState<boolean>(false);
@@ -46,29 +49,52 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
         setTimeout(() => detectFaces(mirrored), 100);
         return;
       }
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      
+      // Canvas のサイズをビデオストリームの実際のサイズに設定
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
+      
+      // 顔検出用の一時Canvas（ビデオ画像を描画して検出に使用）
+      const detectionCanvas = document.createElement("canvas");
+      detectionCanvas.width = videoWidth;
+      detectionCanvas.height = videoHeight;
+      const detectionCtx = detectionCanvas.getContext("2d");
+      if (!detectionCtx) {
+        setTimeout(() => detectFaces(mirrored), 100);
+        return;
+      }
+      
       const processDetection = () => {
         if (
           video.videoWidth !== 0 &&
           video.videoHeight !== 0
         ) {
+          // 顔検出用の一時Canvasにビデオを描画
+          detectionCtx.clearRect(0, 0, detectionCanvas.width, detectionCanvas.height);
+          if (mirrored) {
+            detectionCtx.save();
+            detectionCtx.scale(-1, 1);
+            detectionCtx.translate(-detectionCanvas.width, 0);
+          }
+          detectionCtx.drawImage(video, 0, 0, detectionCanvas.width, detectionCanvas.height);
+          if (mirrored) {
+            detectionCtx.restore();
+          }
+          
+          // オーバーレイCanvasはクリア（透明にする）
           context.clearRect(0, 0, canvas.width, canvas.height);
-          if (mirrored) {
-            context.save();
-            context.scale(-1, 1);
-            context.translate(-canvas.width, 0);
-          }
-          context.drawImage(video, 0, 0, canvas.width, canvas.height)
-          if (mirrored) {
-            context.restore();
-          }
-          const detections = faceDetector.detect(canvas);
+
+          // 顔検出は一時Canvasで実行
+          const detections = faceDetector.detect(detectionCanvas);
           detections.detections.forEach((detection) => {
             if (!detection.boundingBox) {
               return;
             }
             const { originX, originY, width, height } = detection.boundingBox;
+            
+            // 顔の中心にオーバーレイを描画（動画座標系のまま描画する）
             const centerX = originX + width / 2;
             const centerY = originY + height / 2;
             const overlaySize = width * 1.2;

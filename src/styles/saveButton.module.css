@@ -1,7 +1,7 @@
 .button {
   aspect-ratio: 2 / 1;
   border-radius: 0.5rem;
-  font-size: 1rem;
+  font-size: clamp(0.95rem, 2.6vmin, 1.15rem);
   font-weight: bold;
   color: #000;
   background: #fff;
@@ -10,14 +10,15 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 0.1rem;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
   cursor: pointer;
   z-index: 10;
   transition: all 0.2s ease-in-out;
 }
 
 .icon {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: clamp(1.25rem, 3.8vmin, 1.7rem);
+  height: clamp(1.25rem, 3.8vmin, 1.7rem);
   fill: #000; 
 }

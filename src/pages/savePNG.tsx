@@ -1,13 +1,17 @@
 import Canvas from "@/components/ui/Canvas";
 import SaveButton from "@/components/ui/SaveButton";
+import SaveActionDialog from "@/components/ui/SaveActionDialog";
 import useImageDataCompositor from "@/hooks/useImageDataCompositor";
 import usePngEncoder from "@/hooks/usePngEncoder";
 import useOnSave from "@/hooks/useOnSave";
+import useOnSaveToLocation from "@/hooks/useOnSaveToLocation";
+import useOnShare from "@/hooks/useOnShare";
 import style from "@/styles/page.module.css";
 import ShutterFadeOut from "@/components/ui/ShutterFadeOut";
 import ProgressIndicator from "@/components/ui/ProgressIndicator";
 import useArPhotoFrameContext from "@/hooks/useArPhotoFrameContext";
 import useDrawImageData from "@/hooks/useDrawImageData";
+import { useState } from "react";
 
 const SaveImage = () => {
   const { capturedCanvas, overlayCanvas } = useArPhotoFrameContext();
@@ -15,6 +19,24 @@ const SaveImage = () => {
   const { canvasRef } = useDrawImageData(combinedImageData);
   const { blob } = usePngEncoder(combinedImageData);
   const { onSave } = useOnSave(blob, ".png");
+  const { canShare, onShare } = useOnShare(blob, ".png");
+  const { canSaveToLocation, onSaveToLocation } = useOnSaveToLocation(blob, ".png");
+  const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
+
+  const shouldOpenActionDialog = canShare || canSaveToLocation;
+
+  const handleSaveClick = () => {
+    if (!blob) {
+      return;
+    }
+
+    if (shouldOpenActionDialog) {
+      setIsActionDialogOpen(true);
+      return;
+    }
+
+    onSave();
+  };
 
   return (
     <div className={style.body}>
@@ -25,7 +47,16 @@ const SaveImage = () => {
             <ProgressIndicator isLoading={!blob} className={style["mini-progress-indicator"]}>
               PNGにエンコード中...
             </ProgressIndicator>
-            {blob && <SaveButton onClick={onSave} className={style["save-button"]} />}
+            {blob && <SaveButton onClick={handleSaveClick} className={style["save-button"]} />}
+            <SaveActionDialog
+              isOpen={isActionDialogOpen}
+              canShare={canShare}
+              canSaveToLocation={canSaveToLocation}
+              onClose={() => setIsActionDialogOpen(false)}
+              onShare={onShare}
+              onSaveToLocation={onSaveToLocation}
+              onDownload={onSave}
+            />
           </>
         )}
       </div>

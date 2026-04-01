@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Camera from "@/components/ui/Camera";
 import Canvas from "@/components/ui/Canvas";
@@ -16,13 +16,37 @@ import useFetchFile from "@/hooks/useFetchFile";
 
 const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayGif } = useArPhotoFrameContext();
-  const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
-    useWebcam();
+  const {
+    webcamRef,
+    videoConstraints,
+    facingMode,
+    isCameraReady,
+    onCapture,
+    onUserMedia,
+    onUserMediaError,
+    toggleFacingMode,
+  } = useWebcam(aspectRatio);
   const { file } = useFetchFile(fileUrl);
   const { gif } = useGifDecoder(file);
-  const { canvasRef, onMount, animateStop } = useGifAnimator(gif);
+  const { canvasRef, onMount, animateStop } = useGifAnimator(gif, webcamRef);
   const { isShutterActive, triggerShutter } = useShutterEffect();
   const router = useRouter();
+  const cameraContainerRef = useRef<HTMLDivElement>(null);
+  const captureGuideRef = useRef<HTMLDivElement>(null);
+
+  const getCropAspectRatio = useCallback(() => {
+    const guide = captureGuideRef.current;
+    if (guide && guide.clientWidth > 0 && guide.clientHeight > 0) {
+      return guide.clientWidth / guide.clientHeight;
+    }
+
+    const container = cameraContainerRef.current;
+    if (container && container.clientWidth > 0 && container.clientHeight > 0) {
+      return container.clientWidth / container.clientHeight;
+    }
+
+    return aspectRatio;
+  }, [aspectRatio]);
 
   useEffect(() => {
     router.prefetch("/saveGIF");
@@ -31,8 +55,9 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
 
   const onClick = useCallback(() => {
     animateStop();
+    const cropAspectRatio = getCropAspectRatio();
     triggerShutter();
-    setCapturedCanvas(onCapture());
+    setCapturedCanvas(onCapture(cropAspectRatio));
     setOverlayGif(gif);
     router.push("/saveGIF");
   }, [
@@ -40,6 +65,7 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
     router,
     setCapturedCanvas,
     triggerShutter,
+    getCropAspectRatio,
     animateStop,
     setOverlayGif,
     gif,
@@ -59,20 +85,31 @@ const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
         カメラを検索中...
       </ProgressIndicator>
       <div className={style["container"]}>
-        <div className={style["camera-container"]}>
+        <div ref={cameraContainerRef} className={style["camera-container"]}>
           <Camera
             webcamRef={webcamRef}
             width={width}
             height={height}
             aspectRatio={aspectRatio}
+            videoConstraints={videoConstraints}
             facingMode={facingMode}
             isCameraReady={file && gif && isCameraReady}
             onUserMedia={onUserMedia}
+            onUserMediaError={onUserMediaError}
             className={style["camera"]}
           />
           {file && gif && isCameraReady && (
             <Canvas canvasRef={canvasRef} onMount={onMount} className={style["overlay-canvas"]} />
           )}
+          <div
+            ref={captureGuideRef}
+            className={style["capture-guide"]}
+            style={{
+              width: `min(100vw, calc(100dvh * ${aspectRatio}))`,
+              height: `min(100dvh, calc(100vw / ${aspectRatio}))`,
+            }}
+            aria-hidden="true"
+          />
         </div>
         {file && gif && isCameraReady && (
           <>
