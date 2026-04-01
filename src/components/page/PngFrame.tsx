@@ -17,10 +17,10 @@ import useImageDataDrawer from "@/hooks/useImageDataDrawer";
 const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayCanvas } = useArPhotoFrameContext();
   const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
-    useWebcam(width, height);
+    useWebcam(aspectRatio);
   const { file } = useFetchFile(fileUrl);
   const { imageData } = usePngDecoder(file);
-  const { canvasRef, onMount } = useImageDataDrawer(imageData);
+  const { canvasRef, onMount } = useImageDataDrawer(imageData, webcamRef);
   const { isShutterActive, triggerShutter } = useShutterEffect();
   const router = useRouter();
 

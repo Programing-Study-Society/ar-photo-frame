@@ -17,10 +17,10 @@ import useFetchFile from "@/hooks/useFetchFile";
 const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayGif } = useArPhotoFrameContext();
   const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
-    useWebcam(width, height);
+    useWebcam(aspectRatio);
   const { file } = useFetchFile(fileUrl);
   const { gif } = useGifDecoder(file);
-  const { canvasRef, onMount, animateStop } = useGifAnimator(gif);
+  const { canvasRef, onMount, animateStop } = useGifAnimator(gif, webcamRef);
   const { isShutterActive, triggerShutter } = useShutterEffect();
   const router = useRouter();
 

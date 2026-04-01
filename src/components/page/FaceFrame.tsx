@@ -15,7 +15,7 @@ import { useFaceDetection } from "@/hooks/useFaceDetection";
 const PngFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayCanvas } = useArPhotoFrameContext();
   const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
-    useWebcam(width, height);
+    useWebcam(aspectRatio);
   const { canvasRef, modelsLoaded, detectFaces } = useFaceDetection(webcamRef, fileUrl);
   const { isShutterActive, triggerShutter } = useShutterEffect();
   const router = useRouter();

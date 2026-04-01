@@ -1,25 +1,18 @@
 /**
- * Canvas を指定されたアスペクト比に中央クロップする
- * object-fit: cover と同じ動作を再現
+ * object-fit: cover と同じクロップ領域を計算する
  * 
- * @param sourceCanvas - 元の Canvas
- * @param targetWidth - ターゲットの幅
- * @param targetHeight - ターゲットの高さ
- * @returns クロップされた新しい Canvas
+ * @param sourceWidth - ソースの幅
+ * @param sourceHeight - ソースの高さ
+ * @param targetAspectRatio - ターゲットのアスペクト比
+ * @returns クロップ領域のオフセットとサイズ
  */
-export const cropCanvas = (
-  sourceCanvas: HTMLCanvasElement | null,
-  targetWidth: number,
-  targetHeight: number
-): HTMLCanvasElement | null => {
-  if (!sourceCanvas) return null;
-
-  const sourceWidth = sourceCanvas.width;
-  const sourceHeight = sourceCanvas.height;
-  const targetAspectRatio = targetWidth / targetHeight;
+export const calculateCropRegion = (
+  sourceWidth: number,
+  sourceHeight: number,
+  targetAspectRatio: number
+): { offsetX: number; offsetY: number; cropWidth: number; cropHeight: number } => {
   const sourceAspectRatio = sourceWidth / sourceHeight;
 
-  // クロップ領域を計算
   let cropWidth: number;
   let cropHeight: number;
   let offsetX: number;
@@ -39,15 +32,42 @@ export const cropCanvas = (
     offsetY = (sourceHeight - cropHeight) / 2;
   }
 
-  // 新しい Canvas を作成してクロップ領域を描画
+  return { offsetX, offsetY, cropWidth, cropHeight };
+};
+
+/**
+ * Canvas を指定されたアスペクト比に中央クロップする
+ * object-fit: cover と同じ動作を再現
+ * 出力サイズはクロップ領域のネイティブサイズを維持（リサイズしない）
+ * 
+ * @param sourceCanvas - 元の Canvas
+ * @param targetAspectRatio - ターゲットのアスペクト比
+ * @returns クロップされた新しい Canvas（ネイティブ解像度）
+ */
+export const cropCanvas = (
+  sourceCanvas: HTMLCanvasElement | null,
+  targetAspectRatio: number
+): HTMLCanvasElement | null => {
+  if (!sourceCanvas) return null;
+
+  const sourceWidth = sourceCanvas.width;
+  const sourceHeight = sourceCanvas.height;
+
+  const { offsetX, offsetY, cropWidth, cropHeight } = calculateCropRegion(
+    sourceWidth,
+    sourceHeight,
+    targetAspectRatio
+  );
+
+  // 新しい Canvas を作成してクロップ領域を描画（ネイティブ解像度を維持）
   const croppedCanvas = document.createElement("canvas");
-  croppedCanvas.width = targetWidth;
-  croppedCanvas.height = targetHeight;
+  croppedCanvas.width = Math.round(cropWidth);
+  croppedCanvas.height = Math.round(cropHeight);
 
   const ctx = croppedCanvas.getContext("2d");
   if (!ctx) return null;
 
-  // クロップした領域を新しい Canvas に描画
+  // クロップした領域を新しい Canvas に描画（リサイズなし）
   ctx.drawImage(
     sourceCanvas,
     offsetX,
@@ -56,8 +76,8 @@ export const cropCanvas = (
     cropHeight,
     0,
     0,
-    targetWidth,
-    targetHeight
+    croppedCanvas.width,
+    croppedCanvas.height
   );
 
   return croppedCanvas;

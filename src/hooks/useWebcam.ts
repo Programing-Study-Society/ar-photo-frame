@@ -4,8 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
 const useWebcam = (
-  targetWidth?: number,
-  targetHeight?: number
+  targetAspectRatio?: number
 ) => {
   const webcamRef = useRef<Webcam>(null);
   const [facingMode, setFacingMode] = useState<CameraFacingMode>("environment");
@@ -27,13 +26,13 @@ const useWebcam = (
       captureCanvas = mirrorCanvas(captureCanvas);
     }
     
-    // クロップ処理（ターゲットディメンションが指定されている場合）
-    if (targetWidth && targetHeight && captureCanvas) {
-      captureCanvas = cropCanvas(captureCanvas, targetWidth, targetHeight);
+    // クロップ処理（ターゲットアスペクト比が指定されている場合）
+    if (targetAspectRatio && captureCanvas) {
+      captureCanvas = cropCanvas(captureCanvas, targetAspectRatio);
     }
     
     return captureCanvas;
-  }, [facingMode, targetWidth, targetHeight]);
+  }, [facingMode, targetAspectRatio]);
 
   const onUserMedia = useCallback(() => {
     setIsCameraReady(true);

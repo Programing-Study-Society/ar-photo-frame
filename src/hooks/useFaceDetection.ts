@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Webcam from "react-webcam";
 import { loadModels } from "@/utils/mediapipe";
 import { FaceDetector } from "@mediapipe/tasks-vision";
-import { calculateCoverTransform } from "@/utils/calculateCoverTransform";
 
 export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, fileUrl: string) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -54,18 +53,6 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
       canvas.width = videoWidth;
       canvas.height = videoHeight;
       
-      // 表示領域のサイズを取得（object-fit: cover での表示領域）
-      const displayWidth = video.clientWidth || videoWidth;
-      const displayHeight = video.clientHeight || videoHeight;
-      
-      // object-fit: cover での座標変換を計算
-      const { scale, offsetX, offsetY } = calculateCoverTransform(
-        videoWidth,
-        videoHeight,
-        displayWidth,
-        displayHeight
-      );
-      
       const processDetection = () => {
         if (
           video.videoWidth !== 0 &&
@@ -88,26 +75,11 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
             }
             const { originX, originY, width, height } = detection.boundingBox;
             
-            // object-fit: cover の座標変換を適用
-            // 検出座標は Canvas 全体を基準にしているため、表示領域内の座標に変換
-            const adjustedX = originX - offsetX;
-            const adjustedY = originY - offsetY;
-            const adjustedWidth = width;
-            const adjustedHeight = height;
-            
-            // 表示領域外の顔は無視（クロップされた部分）
-            if (
-              adjustedX + adjustedWidth < 0 ||
-              adjustedY + adjustedHeight < 0 ||
-              adjustedX > displayWidth / scale ||
-              adjustedY > displayHeight / scale
-            ) {
-              return;
-            }
-            
-            const centerX = adjustedX + adjustedWidth / 2;
-            const centerY = adjustedY + adjustedHeight / 2;
-            const overlaySize = adjustedWidth * 1.2;
+            // 顔の中心にオーバーレイを描画
+            // Canvas サイズ = ビデオサイズなので、検出座標はそのまま使用可能
+            const centerX = originX + width / 2;
+            const centerY = originY + height / 2;
+            const overlaySize = width * 1.2;
             const overlayX = centerX - overlaySize / 2;
             const overlayY = centerY - overlaySize / 2;
             context.drawImage(image, overlayX, overlayY, overlaySize, overlaySize);
