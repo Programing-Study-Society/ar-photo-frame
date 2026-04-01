@@ -3,7 +3,10 @@ import Webcam from "react-webcam";
 import { loadModels } from "@/utils/mediapipe";
 import { FaceDetector } from "@mediapipe/tasks-vision";
 
-export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, fileUrl: string) => {
+export const useFaceDetection = (
+  webcamRef: React.RefObject<Webcam | null>,
+  fileUrl: string
+) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [faceDetector, setFaceDetector] = useState<FaceDetector | null>(null);
   const [modelsLoaded, setModelsLoaded] = useState<boolean>(false);
@@ -82,7 +85,7 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
           
           // オーバーレイCanvasはクリア（透明にする）
           context.clearRect(0, 0, canvas.width, canvas.height);
-          
+
           // 顔検出は一時Canvasで実行
           const detections = faceDetector.detect(detectionCanvas);
           detections.detections.forEach((detection) => {
@@ -91,7 +94,7 @@ export const useFaceDetection = (webcamRef: React.RefObject<Webcam | null>, file
             }
             const { originX, originY, width, height } = detection.boundingBox;
             
-            // 顔の中心にオーバーレイを描画（オーバーレイCanvasに）
+            // 顔の中心にオーバーレイを描画（動画座標系のまま描画する）
             const centerX = originX + width / 2;
             const centerY = originY + height / 2;
             const overlaySize = width * 1.2;

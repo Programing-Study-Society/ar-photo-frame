@@ -1,19 +1,14 @@
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Webcam from "react-webcam";
 
 /**
  * ImageDataをCanvasに描画するフック
  * 
- * Canvasサイズをカメラ映像と同じサイズに設定し、
- * フレーム画像（ImageData）をobject-fit: coverと同じ計算でCanvasに描画する
+ * フレーム画像（ImageData）をCanvasに描画する
  * 
  * @param imageData - 描画するImageData
- * @param webcamRef - カメラ映像のref（サイズ取得用）
  */
-const useImageDataDrawer = (
-  imageData: ImageData | null,
-  webcamRef: React.RefObject<Webcam | null>
-) => {
+const useImageDataDrawer = (imageData: ImageData | null, webcamRef: React.RefObject<Webcam | null>) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -22,27 +17,23 @@ const useImageDataDrawer = (
       return false;
     }
 
+    const video = webcamRef.current.video;
+    if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
+      return false;
+    }
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return false;
 
-    // カメラ映像のサイズを取得
-    const video = webcamRef.current.video;
-    if (!video) return false;
+    // カメラと同じ解像度でオーバーレイを持つ（保存時に同じクロップを適用するため）
+    const canvasWidth = video.videoWidth;
+    const canvasHeight = video.videoHeight;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    const videoWidth = video.videoWidth;
-    const videoHeight = video.videoHeight;
-
-    // ビデオサイズがまだ確定していない場合はリトライ
-    if (videoWidth === 0 || videoHeight === 0) {
-      return false;
-    }
-
-    // CanvasサイズをVideoサイズに設定
-    canvas.width = videoWidth;
-    canvas.height = videoHeight;
-
-    // フレーム画像をImageDataから一時Canvasに描画
+    // PNGを一時Canvasへ
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = imageData.width;
     tempCanvas.height = imageData.height;
@@ -50,30 +41,53 @@ const useImageDataDrawer = (
     if (!tempCtx) return false;
     tempCtx.putImageData(imageData, 0, 0);
 
-    // フレーム画像をobject-fit: coverと同じ計算でCanvasに描画
+    // カメラは preview で object-fit: cover されるため、
+    // 実際に画面に見えているビデオ領域を基準にオーバーレイを配置する。
     const frameAspectRatio = imageData.width / imageData.height;
-    const videoAspectRatio = videoWidth / videoHeight;
+    const videoAspectRatio = canvasWidth / canvasHeight;
+
+    const container = video.parentElement as HTMLElement | null;
+    const previewWidth = container?.clientWidth || video.clientWidth || canvasWidth;
+    const previewHeight = container?.clientHeight || video.clientHeight || canvasHeight;
+    const previewAspectRatio =
+      previewWidth > 0 && previewHeight > 0
+        ? previewWidth / previewHeight
+        : videoAspectRatio;
+
+    // video全体のうち、cover表示で実際に見える矩形（video座標系）
+    let visibleX = 0;
+    let visibleY = 0;
+    let visibleWidth = canvasWidth;
+    let visibleHeight = canvasHeight;
+
+    if (videoAspectRatio > previewAspectRatio) {
+      visibleHeight = canvasHeight;
+      visibleWidth = canvasHeight * previewAspectRatio;
+      visibleX = (canvasWidth - visibleWidth) / 2;
+    } else if (videoAspectRatio < previewAspectRatio) {
+      visibleWidth = canvasWidth;
+      visibleHeight = canvasWidth / previewAspectRatio;
+      visibleY = (canvasHeight - visibleHeight) / 2;
+    }
 
     let drawWidth: number;
     let drawHeight: number;
     let drawX: number;
     let drawY: number;
 
-    if (videoAspectRatio > frameAspectRatio) {
-      // カメラの方が横長 → フレーム画像を左右に引き延ばす
-      drawWidth = videoWidth;
-      drawHeight = videoWidth / frameAspectRatio;
-      drawX = 0;
-      drawY = (videoHeight - drawHeight) / 2;
+    // ガイドラインと一致するよう、見えている矩形内でcontain配置
+    if (previewAspectRatio > frameAspectRatio) {
+      drawHeight = visibleHeight;
+      drawWidth = visibleHeight * frameAspectRatio;
+      drawX = visibleX + (visibleWidth - drawWidth) / 2;
+      drawY = visibleY;
     } else {
-      // カメラの方が縦長 → フレーム画像を上下に引き延ばす
-      drawHeight = videoHeight;
-      drawWidth = videoHeight * frameAspectRatio;
-      drawX = (videoWidth - drawWidth) / 2;
-      drawY = 0;
+      drawWidth = visibleWidth;
+      drawHeight = visibleWidth / frameAspectRatio;
+      drawX = visibleX;
+      drawY = visibleY + (visibleHeight - drawHeight) / 2;
     }
 
-    // フレーム画像をCanvas全体にcover表示で描画
     ctx.drawImage(
       tempCanvas,
       0,
@@ -90,7 +104,6 @@ const useImageDataDrawer = (
   }, [imageData, webcamRef]);
 
   const onMount = useCallback(() => {
-    // 既存のリトライをキャンセル
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
@@ -99,7 +112,6 @@ const useImageDataDrawer = (
     const tryDraw = () => {
       const success = drawToCanvas();
       if (!success) {
-        // 描画に失敗した場合は100ms後にリトライ
         retryTimeoutRef.current = setTimeout(tryDraw, 100);
       }
     };
@@ -107,7 +119,6 @@ const useImageDataDrawer = (
     tryDraw();
   }, [drawToCanvas]);
 
-  // クリーンアップ
   useEffect(() => {
     return () => {
       if (retryTimeoutRef.current) {

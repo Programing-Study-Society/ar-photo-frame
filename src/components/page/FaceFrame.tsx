@@ -11,12 +11,21 @@ import useWebcam from "@/hooks/useWebcam";
 import { useShutterEffect } from "@/hooks/useShutterEffect";
 import style from "@/styles/page.module.css";
 import { useFaceDetection } from "@/hooks/useFaceDetection";
-import { cropCanvas } from "@/utils/cropCanvas";
+import { cloneCanvas } from "@/utils/cloneCanvas";
 
 const FaceFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayCanvas } = useArPhotoFrameContext();
-  const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
-    useWebcam(aspectRatio);
+  const {
+    webcamRef,
+    videoConstraints,
+    facingMode,
+    isCameraReady,
+    onCapture,
+    onUserMedia,
+    onUserMediaError,
+    toggleFacingMode,
+  } =
+    useWebcam(aspectRatio, { enableCrop: false });
   const { canvasRef, modelsLoaded, detectFaces } = useFaceDetection(webcamRef, fileUrl);
   const { isShutterActive, triggerShutter } = useShutterEffect();
   const router = useRouter();
@@ -31,13 +40,25 @@ const FaceFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   }, [onUserMedia, detectFaces, facingMode]);
 
   const onClick = useCallback(() => {
+    const captured = onCapture();
+    const overlay = cloneCanvas(canvasRef.current);
+
+    if (!captured || !overlay) {
+      return;
+    }
+
     triggerShutter();
-    setCapturedCanvas(onCapture());
-    // オーバーレイCanvasもカメラと同じアスペクト比でクロップ
-    const croppedOverlay = cropCanvas(canvasRef.current, aspectRatio);
-    setOverlayCanvas(croppedOverlay);
+    setCapturedCanvas(captured);
+    setOverlayCanvas(overlay);
     router.push("/savePNG");
-  }, [canvasRef, onCapture, router, setCapturedCanvas, setOverlayCanvas, triggerShutter, aspectRatio]);
+  }, [
+    canvasRef,
+    onCapture,
+    router,
+    setCapturedCanvas,
+    setOverlayCanvas,
+    triggerShutter,
+  ]);
 
   return (
     <div className={style["body"]}>
@@ -57,13 +78,17 @@ const FaceFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
               width={width}
               height={height}
               aspectRatio={aspectRatio}
+              videoConstraints={videoConstraints}
               facingMode={facingMode}
               isCameraReady={isCameraReady}
               onUserMedia={newOnUserMedia}
+              onUserMediaError={onUserMediaError}
               className={style["camera"]}
             />
           )}
-          {isCameraReady && <Canvas canvasRef={canvasRef} className={style["overlay-canvas"]} />}
+          {isCameraReady && (
+            <Canvas canvasRef={canvasRef} className={style["overlay-canvas-face"]} />
+          )}
         </div>
         {isCameraReady && (
           <>

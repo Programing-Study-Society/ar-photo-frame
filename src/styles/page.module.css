@@ -13,15 +13,15 @@
 }
 
 .camera-container {
-  width: 100%;
-  max-height: 100dvh;
+  width: 100vw;
+  height: 100dvh;
   position: relative;
+  overflow: hidden;
 }
 
 .camera {
   width: 100%;
   height: 100%;
-  max-height: 100dvh;
   display: block;
 }
 
@@ -33,6 +33,35 @@
   height: 100%;
 }
 
+.overlay-canvas-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.capture-guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.overlay-canvas-png {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .canvas {
   width: 100%;
   height: 100%;
@@ -41,20 +70,22 @@
 }
 
 .capture-button {
-  width: 5rem;
-  height: 5rem;
+  width: clamp(4.75rem, 14vmin, 6.5rem);
+  height: clamp(4.75rem, 14vmin, 6.5rem);
   position: absolute;
-  bottom: 3%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
   left: 50%;
   transform: translate(-50%);
+  z-index: 40;
 }
 
 .camera-toggle-facing-button {
-  width: 5rem;
-  height: 5rem;
+  width: clamp(4.5rem, 12.5vmin, 6rem);
+  height: clamp(4.5rem, 12.5vmin, 6rem);
   position: absolute;
-  bottom: 3%;
-  right: 3%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+  right: max(0.75rem, env(safe-area-inset-right, 0px));
+  z-index: 40;
 }
 
 .encode-mode-toggle-switch {
@@ -74,11 +105,13 @@
 }
 
 .save-button {
-  height: 5rem;
+  width: clamp(8.5rem, 28vmin, 11rem);
+  min-height: clamp(3.25rem, 9vmin, 4.25rem);
   position: absolute;
-  bottom: 3%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
   left: 50%;
   transform: translate(-50%);
+  z-index: 40;
 }
 
 .mini-progress-indicator {

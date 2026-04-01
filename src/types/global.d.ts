@@ -7,9 +7,11 @@ declare global {
     width: number;
     height: number;
     aspectRatio: number;
+    videoConstraints: MediaTrackConstraints;
     facingMode: CameraFacingMode;
     isCameraReady: boolean | null;
     onUserMedia?: (stream: MediaStream) => void;
+    onUserMediaError?: (error: string | DOMException) => void;
     className?: string;
   }
 

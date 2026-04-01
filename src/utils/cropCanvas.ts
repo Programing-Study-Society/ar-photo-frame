@@ -87,3 +87,35 @@ export const cropCanvas = (
 
   return croppedCanvas;
 };
+
+/**
+ * Canvas を指定矩形でクロップする
+ *
+ * @param sourceCanvas - 元の Canvas
+ * @param region - ソースCanvas座標系での切り出し矩形
+ * @returns クロップされた新しい Canvas
+ */
+export const cropCanvasByRegion = (
+  sourceCanvas: HTMLCanvasElement | null,
+  region: { x: number; y: number; width: number; height: number }
+): HTMLCanvasElement | null => {
+  if (!sourceCanvas) return null;
+  if (sourceCanvas.width === 0 || sourceCanvas.height === 0) return null;
+
+  const x = Math.max(0, Math.floor(region.x));
+  const y = Math.max(0, Math.floor(region.y));
+  const maxWidth = sourceCanvas.width - x;
+  const maxHeight = sourceCanvas.height - y;
+  const width = Math.max(1, Math.min(maxWidth, Math.floor(region.width)));
+  const height = Math.max(1, Math.min(maxHeight, Math.floor(region.height)));
+
+  const croppedCanvas = document.createElement("canvas");
+  croppedCanvas.width = width;
+  croppedCanvas.height = height;
+
+  const ctx = croppedCanvas.getContext("2d");
+  if (!ctx) return null;
+
+  ctx.drawImage(sourceCanvas, x, y, width, height, 0, 0, width, height);
+  return croppedCanvas;
+};

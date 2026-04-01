@@ -8,27 +8,25 @@ const Camera = ({
   width: _width,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   height: _height,
-  aspectRatio,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  aspectRatio: _aspectRatio,
+  videoConstraints,
   facingMode,
   isCameraReady,
   onUserMedia,
+  onUserMediaError,
   className,
 }: CameraProps) => {
-  const videoConstraints: MediaTrackConstraints = {
-    width: { ideal: 1920 },
-    height: { ideal: 1080 },
-    aspectRatio: { ideal: aspectRatio },
-    facingMode: { ideal: facingMode },
-  };
-
   return (
     <Webcam
+      key={JSON.stringify(videoConstraints)}
       audio={false}
       ref={webcamRef}
       forceScreenshotSourceSize={true}
       videoConstraints={videoConstraints}
       className={classNames(style["camera"], className)}
       onUserMedia={onUserMedia}
+      onUserMediaError={onUserMediaError}
       mirrored={facingMode === "user"}
       style={{
         display: isCameraReady ? "" : "none",
