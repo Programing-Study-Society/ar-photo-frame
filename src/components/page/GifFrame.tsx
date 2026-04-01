@@ -17,7 +17,7 @@ import useFetchFile from "@/hooks/useFetchFile";
 const GifFrame = ({ fileUrl, width, height, aspectRatio }: FrameProps) => {
   const { setCapturedCanvas, setOverlayGif } = useArPhotoFrameContext();
   const { webcamRef, facingMode, isCameraReady, onCapture, onUserMedia, toggleFacingMode } =
-    useWebcam();
+    useWebcam(width, height);
   const { file } = useFetchFile(fileUrl);
   const { gif } = useGifDecoder(file);
   const { canvasRef, onMount, animateStop } = useGifAnimator(gif);

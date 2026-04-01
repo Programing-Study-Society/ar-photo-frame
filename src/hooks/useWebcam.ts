@@ -1,8 +1,12 @@
+import { cropCanvas } from "@/utils/cropCanvas";
 import { mirrorCanvas } from "@/utils/mirrorCanvas";
 import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
-const useWebcam = () => {
+const useWebcam = (
+  targetWidth?: number,
+  targetHeight?: number
+) => {
   const webcamRef = useRef<Webcam>(null);
   const [facingMode, setFacingMode] = useState<CameraFacingMode>("environment");
   const [isCameraReady, setIsCameraReady] = useState(false);
@@ -16,10 +20,20 @@ const useWebcam = () => {
     if (!webcamRef.current) {
       return null
     }
-    const captureCanvas = webcamRef.current.getCanvas();
-    if (facingMode === "user") return mirrorCanvas(captureCanvas);
-    return captureCanvas
-  }, []);
+    let captureCanvas = webcamRef.current.getCanvas();
+    
+    // ミラーリング処理（フロントカメラの場合）
+    if (facingMode === "user") {
+      captureCanvas = mirrorCanvas(captureCanvas);
+    }
+    
+    // クロップ処理（ターゲットディメンションが指定されている場合）
+    if (targetWidth && targetHeight && captureCanvas) {
+      captureCanvas = cropCanvas(captureCanvas, targetWidth, targetHeight);
+    }
+    
+    return captureCanvas;
+  }, [facingMode, targetWidth, targetHeight]);
 
   const onUserMedia = useCallback(() => {
     setIsCameraReady(true);
