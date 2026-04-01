@@ -13,9 +13,9 @@ const Camera = ({
   className,
 }: CameraProps) => {
   const videoConstraints: MediaTrackConstraints = {
-    width: { ideal: width },
-    height: { ideal: height },
-    aspectRatio: { exact: aspectRatio },
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+    aspectRatio: { ideal: aspectRatio },
     facingMode: { ideal: facingMode },
   };
 
