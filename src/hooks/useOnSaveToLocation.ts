@@ -1,6 +1,18 @@
 import { formatDate } from '@/utils/formatDate';
 import { useCallback, useMemo } from 'react';
 
+type SaveFilePickerOptions = {
+  suggestedName?: string;
+  types?: Array<{
+    description?: string;
+    accept?: Record<string, string[]>;
+  }>;
+};
+
+type SaveFilePickerWindow = Window & {
+  showSaveFilePicker: (options: SaveFilePickerOptions) => Promise<FileSystemFileHandle>;
+};
+
 const useOnSaveToLocation = (blob: Blob | null, extension: string) => {
   const fileName = useMemo(() => 'oecu_' + formatDate() + extension, [extension]);
 
@@ -14,7 +26,8 @@ const useOnSaveToLocation = (blob: Blob | null, extension: string) => {
     }
 
     try {
-      const fileHandle = await window.showSaveFilePicker({
+      const { showSaveFilePicker } = window as SaveFilePickerWindow;
+      const fileHandle = await showSaveFilePicker({
         suggestedName: fileName,
         types: [
           {

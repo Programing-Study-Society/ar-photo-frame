@@ -23,7 +23,7 @@ const useWebcam = (
     return width / height;
   }, []);
 
-  const getVideoConstraints = useCallback((): MediaTrackConstraints => {
+  const getVideoConstraints = useCallback((): MediaTrackConstraints & { resizeMode?: string } => {
     const viewportAspectRatio = getViewportAspectRatio();
 
     return {
