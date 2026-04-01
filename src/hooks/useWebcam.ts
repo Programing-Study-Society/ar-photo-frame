@@ -2,6 +2,43 @@ import { mirrorCanvas } from "@/utils/mirrorCanvas";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
+const drawCoverImage = (
+  context: CanvasRenderingContext2D,
+  source: CanvasImageSource,
+  sourceWidth: number,
+  sourceHeight: number,
+  targetWidth: number,
+  targetHeight: number
+) => {
+  const sourceAspectRatio = sourceWidth / sourceHeight;
+  const targetAspectRatio = targetWidth / targetHeight;
+
+  let sourceX = 0;
+  let sourceY = 0;
+  let sourceCropWidth = sourceWidth;
+  let sourceCropHeight = sourceHeight;
+
+  if (sourceAspectRatio > targetAspectRatio) {
+    sourceCropWidth = sourceHeight * targetAspectRatio;
+    sourceX = (sourceWidth - sourceCropWidth) / 2;
+  } else if (sourceAspectRatio < targetAspectRatio) {
+    sourceCropHeight = sourceWidth / targetAspectRatio;
+    sourceY = (sourceHeight - sourceCropHeight) / 2;
+  }
+
+  context.drawImage(
+    source,
+    sourceX,
+    sourceY,
+    sourceCropWidth,
+    sourceCropHeight,
+    0,
+    0,
+    targetWidth,
+    targetHeight
+  );
+};
+
 const useWebcam = () => {
   const webcamRef = useRef<Webcam>(null);
   const cameraReadyAnimationFrameRef = useRef<number | null>(null);
@@ -41,15 +78,34 @@ const useWebcam = () => {
       return null;
     }
 
-    const sourceCanvas = webcamRef.current.getCanvas();
-    if (sourceCanvas) {
-      context.drawImage(sourceCanvas, 0, 0, options.width, options.height);
+    const sourceVideo = webcamRef.current.video;
+    if (
+      sourceVideo &&
+      sourceVideo.videoWidth > 0 &&
+      sourceVideo.videoHeight > 0 &&
+      sourceVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+    ) {
+      drawCoverImage(
+        context,
+        sourceVideo,
+        sourceVideo.videoWidth,
+        sourceVideo.videoHeight,
+        options.width,
+        options.height
+      );
     } else {
-      const sourceVideo = webcamRef.current.video;
-      if (!sourceVideo || sourceVideo.videoWidth <= 0 || sourceVideo.videoHeight <= 0) {
+      const sourceCanvas = webcamRef.current.getCanvas();
+      if (!sourceCanvas || sourceCanvas.width <= 0 || sourceCanvas.height <= 0) {
         return null;
       }
-      context.drawImage(sourceVideo, 0, 0, options.width, options.height);
+      drawCoverImage(
+        context,
+        sourceCanvas,
+        sourceCanvas.width,
+        sourceCanvas.height,
+        options.width,
+        options.height
+      );
     }
 
     if (facingMode === "user") {
@@ -68,7 +124,7 @@ const useWebcam = () => {
         sourceVideo &&
         sourceVideo.videoWidth > 0 &&
         sourceVideo.videoHeight > 0 &&
-        sourceVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+        sourceVideo.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA
       ) {
         setIsCameraReady(true);
         cameraReadyAnimationFrameRef.current = null;
