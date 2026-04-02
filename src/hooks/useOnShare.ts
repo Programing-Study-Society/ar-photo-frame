@@ -44,7 +44,6 @@ const useOnShare = (blob: Blob | null, extension: string) => {
     void navigator
       .share({
         files: [file],
-        title: fileName,
       })
       .catch((error) => {
         if (error instanceof DOMException && error.name === 'AbortError') {
