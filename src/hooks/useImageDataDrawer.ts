@@ -47,12 +47,15 @@ const useImageDataDrawer = (imageData: ImageData | null, webcamRef: React.RefObj
     const videoAspectRatio = canvasWidth / canvasHeight;
 
     const container = video.parentElement as HTMLElement | null;
-    const previewWidth = container?.clientWidth || video.clientWidth || canvasWidth;
-    const previewHeight = container?.clientHeight || video.clientHeight || canvasHeight;
-    const previewAspectRatio =
-      previewWidth > 0 && previewHeight > 0
-        ? previewWidth / previewHeight
-        : videoAspectRatio;
+    const previewWidth = container?.clientWidth || video.clientWidth || 0;
+    const previewHeight = container?.clientHeight || video.clientHeight || 0;
+
+    // レイアウト未完了（clientWidth/Height が 0）の場合はリトライ
+    if (previewWidth === 0 || previewHeight === 0) {
+      return false;
+    }
+
+    const previewAspectRatio = previewWidth / previewHeight;
 
     // video全体のうち、cover表示で実際に見える矩形（video座標系）
     let visibleX = 0;
