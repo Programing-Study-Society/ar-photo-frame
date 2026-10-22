@@ -39,7 +39,7 @@ Next.js の脆弱性の多くはサーバー機能（Middleware、Server Actions
 ## 3. アプリケーションコード
 | 重要度 | 内容 | 対応 |
 |---|---|---|
-| 中 | MediaPipe の WASM を `cdn.jsdelivr.net/.../tasks-vision@latest` から読み込み。`@latest` は 1.1.1 を指しており、npm 側の 0.10.22 と不一致。パッケージが乗っ取られた場合、カメラ権限を持つページで任意コードが動く | インストール済みと同じバージョンに固定し、package.json もキャレットなしで固定 |
+| 中 | MediaPipe の WASM を `cdn.jsdelivr.net/.../tasks-vision@latest` から読み込み。`@latest` は 1.1.1 を指しており、npm 側の 0.10.22 と不一致。パッケージが乗っ取られた場合、カメラ権限を持つページで任意コードが動く | ビルド時に `node_modules` から `public/mediapipe/wasm` へコピーし、自サイト（Cloudflare Pages）から配信するよう変更。外部 CDN 依存を解消（`scripts/copy-mediapipe-wasm.cjs`） |
 | 低 | セキュリティヘッダーなし | `public/_headers` に nosniff / X-Frame-Options / Referrer-Policy / Permissions-Policy（camera=self のみ）を追加 |
 | 情報 | `?debug=true` の隠しページはクライアント側の判定のみ。中身は公開データなので問題はないが、アクセス制御としては機能しない | 対応不要 |
 
@@ -47,6 +47,5 @@ XSS につながる `dangerouslySetInnerHTML` / `eval` / URL パラメータの�
 
 ## 今後の推奨
 1. Cloudflare Pages の環境変数 `NODE_VERSION` も 22.23.4 以上に（`.nvmrc` を読まない設定の場合）。
-2. Content-Security-Policy の導入（MediaPipe の CDN と `wasm-unsafe-eval`、`blob:` を許可する必要があるので、実機確認しながら）。
-3. MediaPipe WASM を `public/` に同梱し、外部 CDN 依存をなくす。
-4. Dependabot など依存更新の自動化。
+2. Content-Security-Policy の導入（外部 CDN が不要になったので `script-src 'self' 'wasm-unsafe-eval'` 程度で済む見込み。`blob:` の許可など実機確認しながら）。
+3. Dependabot など依存更新の自動化。

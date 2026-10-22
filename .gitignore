@@ -42,3 +42,5 @@ next-env.d.ts
 
 # user
 certificates
+# copied from node_modules at build time
+/public/mediapipe/
